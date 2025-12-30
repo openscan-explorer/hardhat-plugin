@@ -5,13 +5,16 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "watch": "tsc --build . --watch"
+    "watch": "tsc --build . --watch",
+    "node": "hardhat run scripts/run-node.ts",
+    "deploy": "hardhat run scripts/deploy.ts",
+    "send-tx": "hardhat run scripts/send-transactions.ts --"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
     "@types/node": "^22.11.0",
     "hardhat": "^3.0.11",
-    "hardhat-my-plugin": "workspace:*",
+    "openscan-hardhat-links": "workspace:*",
     "typescript": "~5.8.0",
     "forge-std": "github:foundry-rs/forge-std#v1.9.4"
   }

@@ -1,6 +1,6 @@
 {
-  "name": "hardhat3-plugin-template",
-  "private": true,
+  "name": "openscan-hardhat-plugin",
+  "private": false,
   "scripts": {
     "build": "pnpm --recursive build",
     "clean": "pnpm --recursive clean",

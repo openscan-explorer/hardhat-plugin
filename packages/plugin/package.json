@@ -1,7 +1,7 @@
 {
-  "name": "hardhat-my-plugin",
-  "version": "1.0.0",
-  "description": "Hardhat 3 plugin template",
+  "name": "openscan-hardhat-links",
+  "version": "0.0.3",
+  "description": "Hardhat 3 plugin to display OpenScan links",
   "license": "MIT",
   "type": "module",
   "types": "dist/src/index.d.ts",
@@ -13,18 +13,14 @@
     "smart-contracts",
     "hardhat",
     "hardhat3",
-    "hardhat-plugin"
+    "hardhat-plugin",
+    "OpenScan"
   ],
   "scripts": {
     "lint": "pnpm prettier --check && pnpm eslint",
     "lint:fix": "pnpm prettier --write && pnpm eslint --fix",
-    "eslint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "eslint": "eslint \"src/**/*.ts\"",
     "prettier": "prettier \"**/*.{ts,js,md,json}\"",
-    "test": "node --import tsx/esm --test --test-reporter=@nomicfoundation/hardhat-node-test-reporter \"test/*.ts\" \"test/!(fixture-projects|helpers)/**/*.ts\"",
-    "test:only": "node --import tsx/esm --test --test-only --test-reporter=@nomicfoundation/hardhat-node-test-reporter \"test/*.ts\" \"test/!(fixture-projects|helpers)/**/*.ts\"",
-    "test:coverage": "c8 --reporter html --reporter text --all --exclude test --exclude \"src/**/{types,type-extensions}.ts\" --src src node --import tsx/esm --test --test-reporter=@nomicfoundation/hardhat-node-test-reporter \"test/*.ts\" \"test/!(fixture-projects|helpers)/**/*.ts\"",
-    "pretest": "pnpm build",
-    "pretest:only": "pnpm build",
     "build": "tsc --build .",
     "prepublishOnly": "pnpm build",
     "clean": "rimraf dist",
@@ -55,5 +51,8 @@
   },
   "peerDependencies": {
     "hardhat": "^3.0.11"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
