@@ -1,7 +1,9 @@
-export interface MyPluginUserConfig {
-  greeting?: string;
+export interface OpenScanUserConfig {
+  url?: string;
+  chainId?: number;
 }
 
-export interface MyPluginConfig {
-  greeting: string;
+export interface OpenScanConfig {
+  url: string;
+  chainId: number;
 }

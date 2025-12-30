@@ -14,34 +14,38 @@ import { HardhatUserConfigValidationError } from "hardhat/types/hooks";
 export async function validatePluginConfig(
   userConfig: HardhatUserConfig,
 ): Promise<HardhatUserConfigValidationError[]> {
-  if (userConfig.myConfig === undefined) {
-    return [];
+  const errors: HardhatUserConfigValidationError[] = [];
+
+  // Validate openScan config
+  if (userConfig.openScan !== undefined) {
+    if (typeof userConfig.openScan !== "object") {
+      errors.push({
+        path: ["openScan"],
+        message: "Expected an object with optional url and chainId.",
+      });
+    } else {
+      const { url, chainId } = userConfig.openScan;
+
+      if (url !== undefined && (typeof url !== "string" || url.length === 0)) {
+        errors.push({
+          path: ["openScan", "url"],
+          message: "Expected a non-empty string.",
+        });
+      }
+
+      if (
+        chainId !== undefined &&
+        (typeof chainId !== "number" || chainId < 0)
+      ) {
+        errors.push({
+          path: ["openScan", "chainId"],
+          message: "Expected a positive number.",
+        });
+      }
+    }
   }
 
-  if (typeof userConfig.myConfig !== "object") {
-    return [
-      {
-        path: ["myConfig"],
-        message: "Expected an object with an optional greeting.",
-      },
-    ];
-  }
-
-  const greeting = userConfig.myConfig?.greeting;
-  if (greeting === undefined) {
-    return [];
-  }
-
-  if (typeof greeting !== "string" || greeting.length === 0) {
-    return [
-      {
-        path: ["myConfig", "greeting"],
-        message: "Expected a non-empty string.",
-      },
-    ];
-  }
-
-  return [];
+  return errors;
 }
 
 /**
@@ -59,11 +63,12 @@ export async function resolvePluginConfig(
   userConfig: HardhatUserConfig,
   partiallyResolvedConfig: HardhatConfig,
 ): Promise<HardhatConfig> {
-  const greeting = userConfig.myConfig?.greeting ?? "Hello";
-  const myConfig = { greeting };
+  const url = userConfig.openScan?.url ?? "http://localhost:3030";
+  const chainId = userConfig.openScan?.chainId ?? 31337;
+  const openScan = { url, chainId };
 
   return {
     ...partiallyResolvedConfig,
-    myConfig,
+    openScan,
   };
 }

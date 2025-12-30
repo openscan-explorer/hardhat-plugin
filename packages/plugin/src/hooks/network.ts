@@ -1,6 +1,13 @@
 import type { HookContext, NetworkHooks } from "hardhat/types/hooks";
 import { ChainType, NetworkConnection } from "hardhat/types/network";
 
+// Helper function to create clickable terminal links
+function createClickableLink(url: string, text?: string): string {
+  const displayText = text || url;
+  // OSC 8 escape sequence for hyperlinks: \e]8;;URL\e\\TEXT\e]8;;\e\\
+  return `\x1b]8;;${url}\x1b\\${displayText}\x1b]8;;\x1b\\`;
+}
+
 export default async (): Promise<Partial<NetworkHooks>> => {
   const handlers: Partial<NetworkHooks> = {
     async newConnection<ChainTypeT extends ChainType | string>(
@@ -11,16 +18,113 @@ export default async (): Promise<Partial<NetworkHooks>> => {
     ): Promise<NetworkConnection<ChainTypeT>> {
       const connection = await next(context);
 
-      console.log("Connection created with ID", connection.id);
+      const { url, chainId } = context.config.openScan;
+      const openScanUrl = `${url}/${chainId}`;
+      console.log(`OpenScan: ${createClickableLink(openScanUrl)}`);
 
       return connection;
     },
     async onRequest(context, networkConnection, jsonRpcRequest, next) {
-      console.log(
-        `Request from connection ${networkConnection.id} is being processed — Method: ${jsonRpcRequest.method}`,
-      );
+      const result = await next(context, networkConnection, jsonRpcRequest);
 
-      return next(context, networkConnection, jsonRpcRequest);
+      const { url, chainId } = context.config.openScan;
+
+      // Log eth_sendTransaction with OpenScan links
+      if (jsonRpcRequest.method === "eth_sendTransaction") {
+        const txHash = (result as { result?: string })?.result;
+        const txParams = (
+          jsonRpcRequest.params as Array<{
+            from?: string;
+            to?: string;
+            data?: string;
+          }>
+        )?.[0];
+
+        if (txHash) {
+          const txUrl = `${url}/${chainId}/tx/${txHash}`;
+          console.log(
+            `${"  Transaction:".padEnd(18)}${createClickableLink(txUrl)}`,
+          );
+
+          if (txParams?.from) {
+            const fromUrl = `${url}/${chainId}/address/${txParams.from}`;
+            console.log(
+              `${"  From:".padEnd(18)}${createClickableLink(fromUrl)}`,
+            );
+          }
+
+          if (txParams?.to) {
+            const toUrl = `${url}/${chainId}/address/${txParams.to}`;
+            console.log(`${"  To:".padEnd(18)}${createClickableLink(toUrl)}`);
+          }
+        }
+      }
+
+      // Detect when a transaction receipt is fetched (indicates transaction was mined)
+      if (jsonRpcRequest.method === "eth_getTransactionReceipt") {
+        const receipt = (
+          result as {
+            result?: {
+              transactionHash: string;
+              blockHash: string;
+              blockNumber: string;
+              from: string;
+              to?: string;
+              gasUsed: string;
+              status?: string;
+              contractAddress?: string;
+            };
+          }
+        )?.result;
+
+        if (receipt && receipt.blockNumber) {
+          const txHash = receipt.transactionHash;
+          const blockNumber = parseInt(receipt.blockNumber, 16);
+
+          const txUrl = `${url}/${chainId}/tx/${txHash}`;
+          const blockUrl = `${url}/${chainId}/block/${blockNumber}`;
+          const fromUrl = `${url}/${chainId}/address/${receipt.from}`;
+
+          console.log(
+            `${"  Transaction:".padEnd(18)}${createClickableLink(txUrl)}`,
+          );
+          console.log(
+            `${`  Block #${blockNumber}:`.padEnd(18)}${createClickableLink(blockUrl)}`,
+          );
+          console.log(`${"  From:".padEnd(18)}${createClickableLink(fromUrl)}`);
+
+          if (receipt.to) {
+            const toUrl = `${url}/${chainId}/address/${receipt.to}`;
+            console.log(`${"  To:".padEnd(18)}${createClickableLink(toUrl)}`);
+          }
+
+          // If this is a contract deployment, also log the contract address
+          if (receipt.contractAddress) {
+            const contractUrl = `${url}/${chainId}/address/${receipt.contractAddress}`;
+            console.log(
+              `${"  Contract:".padEnd(18)}${createClickableLink(contractUrl)}`,
+            );
+          }
+
+          console.log();
+        }
+      }
+
+      // Log eth_accounts responses with OpenScan links
+      if (jsonRpcRequest.method === "eth_accounts") {
+        const accounts = (result as { result?: string[] })?.result;
+
+        if (accounts && Array.isArray(accounts) && accounts.length > 0) {
+          accounts.forEach((address: string, index: number) => {
+            const label = `  [${index}]:`.padEnd(18);
+            const addressUrl = `${url}/${chainId}/address/${address}`;
+            console.log(`${label}${createClickableLink(addressUrl)}`);
+          });
+          console.log();
+        }
+      }
+
+      return result;
     },
   };
 
