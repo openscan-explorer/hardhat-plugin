@@ -49,8 +49,8 @@ export function createOpenscanServer(): OpenscanServer {
 	let webappService: WebappService | null = null;
 
 	// Fixed dist path relative to plugin location
-	// packages/plugin/dist/src -> packages/explorer/dist
-	const distPath = path.resolve(__dirname, "../../explorer/dist");
+	// packages/plugin/dist/src -> packages/plugin -> packages -> packages/explorer/dist
+	const distPath = path.resolve(__dirname, "../../../explorer/dist");
 
 	return {
 		services() {

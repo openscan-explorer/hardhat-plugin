@@ -1,11 +1,51 @@
 import type { HookContext, NetworkHooks } from "hardhat/types/hooks";
 import { ChainType, NetworkConnection } from "hardhat/types/network";
+import { createOpenscanServer, type OpenscanServer } from "../server.js";
+import { isPortAvailable, openBrowser } from "../utils.js";
 
 // Helper function to create clickable terminal links
 function createClickableLink(url: string, text?: string): string {
   const displayText = text || url;
   // OSC 8 escape sequence for hyperlinks: \e]8;;URL\e\\TEXT\e]8;;\e\\
   return `\x1b]8;;${url}\x1b\\${displayText}\x1b]8;;\x1b\\`;
+}
+
+// Module-level state for webapp server
+let webappServer: OpenscanServer | null = null;
+let webappStarted = false;
+
+/**
+ * Start the webapp server
+ * - Checks port 3030 availability (fail fast if occupied)
+ * - Starts server
+ * - Auto-opens browser
+ */
+async function startWebapp(chainId: number) {
+  try {
+    // Check if port 3030 is available (fail fast)
+    const portAvailable = await isPortAvailable();
+    if (!portAvailable) {
+      throw new Error(
+        "Port 3030 is already in use. Please free the port and try again."
+      );
+    }
+
+    // Create and start server
+    webappServer = createOpenscanServer();
+    await webappServer.listen(false); // Non-blocking
+
+    const webappUrl = webappServer.getWebappUrl()!;
+
+    console.log(`\n🔍 OpenScan Explorer: ${createClickableLink(webappUrl)}`);
+    console.log(`   Network: Chain ID ${chainId}\n`);
+
+    // Auto-open browser (always enabled)
+    await openBrowser(webappUrl);
+  } catch (error) {
+    // Fail fast - throw error to stop execution
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to start OpenScan Explorer: ${message}`);
+  }
 }
 
 export default async (): Promise<Partial<NetworkHooks>> => {
@@ -18,9 +58,14 @@ export default async (): Promise<Partial<NetworkHooks>> => {
     ): Promise<NetworkConnection<ChainTypeT>> {
       const connection = await next(context);
 
-      const { url, chainId } = context.config.openScan;
-      const openScanUrl = `${url}/${chainId}`;
-      console.log(`OpenScan: ${createClickableLink(openScanUrl)}`);
+      const { chainId } = context.config.openScan;
+
+      // Start webapp on first connection (when Hardhat node starts)
+      // The network name is "default" for the built-in Hardhat network
+      if (!webappStarted && connection.networkName === "default") {
+        webappStarted = true;
+        await startWebapp(chainId);
+      }
 
       return connection;
     },
@@ -130,3 +175,17 @@ export default async (): Promise<Partial<NetworkHooks>> => {
 
   return handlers;
 };
+
+/**
+ * Cleanup on process exit
+ */
+const cleanup = async () => {
+  if (webappServer) {
+    webappServer.stop();
+    webappServer = null;
+  }
+};
+
+process.on("SIGINT", cleanup);
+process.on("SIGTERM", cleanup);
+process.on("exit", cleanup);
