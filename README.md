@@ -25,10 +25,12 @@ And try the plugin out in `packages/example-project` with:
 
 ```sh
 cd packages/example-project
-pnpm hardhat my-task
+pnpm hardhat node
 ```
 
-which should print `Hola, Hardhat!`.
+This node, should log extra information to openScan debugger.
+
+![OpenScan hardhat logs](image.png)
 
 ## Understanding the repository structure
 
@@ -47,16 +49,7 @@ The `packages/plugin` directory has a complete plugin example. It includes:
 
 - A `README.md` file that documents the plugin.
 - A `src/index.ts` file that defines and exports the plugin.
-- An example task, which is defined in `src/index.ts`, and whose action is in `src/tasks/my-task.ts`.
-- An example of how to extend the Hardhat config, which includes:
-  - The logic to extend the validation and resolution of the Hardhat config, in `src/config.ts`.
-  - The config Hook Handlers to inject that logic into Hardhat, in `src/hooks/config.ts`.
-  - The Type Extensions to add your config to `HardhatUserConfig` and `HardhatConfig`, in `src/type-extensions.ts`.
-- A network Hook Handler, which is in `src/hooks/network.ts`, which shows how to define them, and prints a few debug messages.
-- An example of how to test the config of your plugin, in `test/config.ts`.
-- An example of two different ways to test your plugin functionality, in `test/example-tests.ts`:
-  - Using a file-system based fixture project.
-  - Creating a new Hardhat Runtime Environment with an inline config.
+- A network Hook Handler, which is in `src/hooks/network.ts`, which shows how to define them, and prints OpenScan links.
 
 ### Github Actions setup
 
@@ -71,7 +64,7 @@ pnpm test
 pnpm lint
 ```
 
-It runs using Node.js versions 22 and 24, on an `ubuntu-latest` runner.
+It runs using Node.js 24, on an `ubuntu-latest` runner.
 
 ## Development setup
 

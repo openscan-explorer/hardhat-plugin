@@ -1,4 +1,4 @@
-# `hardhat-my-plugin`
+# `openscan-hardhat-links`
 
 This is an example plugin that adds a task that prints a greeting.
 
@@ -7,14 +7,14 @@ This is an example plugin that adds a task that prints a greeting.
 To install this plugin, run the following command:
 
 ```bash
-npm install --save-dev hardhat-my-plugin
+npm install --save-dev openscan-hardhat-links
 ```
 
 In your `hardhat.config.ts` file, import the plugin and add it to the `plugins` array:
 
 ```ts
 import { defineConfig } from "hardhat/config";
-import myPlugin from "hardhat-my-plugin";
+import myPlugin from "openscan-hardhat-links";
 
 export default defineConfig({
   plugins: [myPlugin],
@@ -23,17 +23,7 @@ export default defineConfig({
 
 ## Usage
 
-The plugin adds a new task called `my-task`. To run it, use the this command:
-
-```bash
-npx hardhat my-task
-```
-
-You should see the following output:
-
-```
-Hello, Hardhat!
-```
+Do nothing, just expect links to openscan in hardhat logs
 
 ### Configuration
 
@@ -41,17 +31,18 @@ You can configure the greeting that's printed by using the `myConfig` field in y
 
 ```ts
 import { defineConfig } from "hardhat/config";
-import myPlugin from "hardhat-my-plugin";
+import myPlugin from "openscan-hardhat-links";
 
 export default defineConfig({
   plugins: [myPlugin],
-  myConfig: {
-    greeting: "Hola",
+  OpenScan: {
+    url: "http://localhost:3030",
+    chainId: "31337",
   },
   //...
 });
 ```
 
-### Network logs
+### RPC Methods calls logs
 
-This plugin also adds some example code to log different network events. To see it in action, all you need to do is run your Hardhat tests, deployment, or a script.
+This plugin adds some example code to log different network events. To see it in action, all you need to do is run your Hardhat tests, deployment, or a script.

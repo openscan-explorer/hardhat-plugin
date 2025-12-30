@@ -11,22 +11,17 @@ pnpm install
 pnpm build
 ```
 
-Then, you can run hardhat with:
+Start the node:
 
 ```sh
-pnpm hardhat my-task
+pnpm hardhat node
 ```
 
-You can also run an example script with:
+Then, you can run scripts:
 
 ```sh
-pnpm hardhat run scripts/example-script.ts
-```
-
-And the project's solidity tests with:
-
-```sh
-pnpm hardhat test
+pnpm run deploy 
+pnpm run send-tx
 ```
 
 ## What's inside the project?
@@ -34,5 +29,3 @@ pnpm hardhat test
 This is a minimal Hardhat 3 project that only has the built-in functionality of Hardhat and your plugin.
 
 This means that you don't have `ethers,` `viem`, `mocha`, nor the Node.js test runner plugins.
-
-Please install whichever dependency or plugin you need in here. This package won't be published, so you have complete freedom to do whatever you want.
