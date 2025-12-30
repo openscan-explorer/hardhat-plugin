@@ -9,20 +9,20 @@ const execAsync = promisify(exec);
  * @returns True if port is available, false otherwise
  */
 export async function isPortAvailable(): Promise<boolean> {
-	return new Promise((resolve) => {
-		const server = net.createServer();
+  return new Promise((resolve) => {
+    const server = net.createServer();
 
-		server.once("error", () => {
-			resolve(false);
-		});
+    server.once("error", () => {
+      resolve(false);
+    });
 
-		server.once("listening", () => {
-			server.close();
-			resolve(true);
-		});
+    server.once("listening", () => {
+      server.close();
+      resolve(true);
+    });
 
-		server.listen(3030);
-	});
+    server.listen(3030);
+  });
 }
 
 /**
@@ -30,28 +30,28 @@ export async function isPortAvailable(): Promise<boolean> {
  * @param url - URL to open
  */
 export async function openBrowser(url: string): Promise<void> {
-	const platform = process.platform;
-	let command: string;
+  const platform = process.platform;
+  let command: string;
 
-	switch (platform) {
-		case "darwin": // macOS
-			command = `open "${url}"`;
-			break;
-		case "win32": // Windows
-			command = `start "" "${url}"`;
-			break;
-		default: // Linux and others
-			command = `xdg-open "${url}"`;
-			break;
-	}
+  switch (platform) {
+    case "darwin": // macOS
+      command = `open "${url}"`;
+      break;
+    case "win32": // Windows
+      command = `start "" "${url}"`;
+      break;
+    default: // Linux and others
+      command = `xdg-open "${url}"`;
+      break;
+  }
 
-	try {
-		await execAsync(command);
-	} catch (error) {
-		// Silently fail - browser opening is optional
-		const message = error instanceof Error ? error.message : String(error);
-		console.warn(`[openscan] Could not auto-open browser: ${message}`);
-	}
+  try {
+    await execAsync(command);
+  } catch (error) {
+    // Silently fail - browser opening is optional
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`[openscan] Could not auto-open browser: ${message}`);
+  }
 }
 
 /**
@@ -61,23 +61,23 @@ export async function openBrowser(url: string): Promise<void> {
  * @throws Error if service does not become ready
  */
 export async function waitForHttpService(
-	maxAttempts: number = 20,
-	delayMs: number = 500
+  maxAttempts: number = 20,
+  delayMs: number = 500,
 ): Promise<void> {
-	for (let i = 0; i < maxAttempts; i++) {
-		try {
-			const response = await fetch(`http://localhost:3030`);
-			if (response.ok) {
-				return;
-			}
-		} catch {
-			// Service not ready yet
-		}
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      const response = await fetch(`http://localhost:3030`);
+      if (response.ok) {
+        return;
+      }
+    } catch {
+      // Service not ready yet
+    }
 
-		await new Promise((resolve) => setTimeout(resolve, delayMs));
-	}
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
 
-	throw new Error(
-		`HTTP service on port 3030 did not become ready after ${maxAttempts} attempts`
-	);
+  throw new Error(
+    `HTTP service on port 3030 did not become ready after ${maxAttempts} attempts`,
+  );
 }

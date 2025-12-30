@@ -12,40 +12,40 @@ import { HardhatUserConfigValidationError } from "hardhat/types/hooks";
  * @returns An array of validation errors, or an empty array if valid.
  */
 export async function validatePluginConfig(
-	userConfig: HardhatUserConfig
+  userConfig: HardhatUserConfig,
 ): Promise<HardhatUserConfigValidationError[]> {
-	const errors: HardhatUserConfigValidationError[] = [];
+  const errors: HardhatUserConfigValidationError[] = [];
 
-	// Validate openScan config
-	if (userConfig.openScan !== undefined) {
-		if (typeof userConfig.openScan !== "object") {
-			errors.push({
-				path: ["openScan"],
-				message: "Expected an object with optional url and chainId.",
-			});
-		} else {
-			const { url, chainId } = userConfig.openScan;
+  // Validate openScan config
+  if (userConfig.openScan !== undefined) {
+    if (typeof userConfig.openScan !== "object") {
+      errors.push({
+        path: ["openScan"],
+        message: "Expected an object with optional url and chainId.",
+      });
+    } else {
+      const { url, chainId } = userConfig.openScan;
 
-			if (url !== undefined && (typeof url !== "string" || url.length === 0)) {
-				errors.push({
-					path: ["openScan", "url"],
-					message: "Expected a non-empty string.",
-				});
-			}
+      if (url !== undefined && (typeof url !== "string" || url.length === 0)) {
+        errors.push({
+          path: ["openScan", "url"],
+          message: "Expected a non-empty string.",
+        });
+      }
 
-			if (
-				chainId !== undefined &&
-				(typeof chainId !== "number" || chainId < 0)
-			) {
-				errors.push({
-					path: ["openScan", "chainId"],
-					message: "Expected a positive number.",
-				});
-			}
-		}
-	}
+      if (
+        chainId !== undefined &&
+        (typeof chainId !== "number" || chainId < 0)
+      ) {
+        errors.push({
+          path: ["openScan", "chainId"],
+          message: "Expected a positive number.",
+        });
+      }
+    }
+  }
 
-	return errors;
+  return errors;
 }
 
 /**
@@ -60,15 +60,15 @@ export async function validatePluginConfig(
  * @returns The resolved HardhatConfig.
  */
 export async function resolvePluginConfig(
-	userConfig: HardhatUserConfig,
-	partiallyResolvedConfig: HardhatConfig
+  userConfig: HardhatUserConfig,
+  partiallyResolvedConfig: HardhatConfig,
 ): Promise<HardhatConfig> {
-	const url = userConfig.openScan?.url ?? "http://localhost:3030";
-	const chainId = userConfig.openScan?.chainId ?? 31337;
-	const openScan = { url, chainId };
+  const url = userConfig.openScan?.url ?? "http://localhost:3030";
+  const chainId = userConfig.openScan?.chainId ?? 31337;
+  const openScan = { url, chainId };
 
-	return {
-		...partiallyResolvedConfig,
-		openScan,
-	};
+  return {
+    ...partiallyResolvedConfig,
+    openScan,
+  };
 }

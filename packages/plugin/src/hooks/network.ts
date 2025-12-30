@@ -26,13 +26,13 @@ async function startWebapp(chainId: number) {
     const portAvailable = await isPortAvailable();
     if (!portAvailable) {
       throw new Error(
-        "Port 3030 is already in use. Please free the port and try again."
+        "Port 3030 is already in use. Please free the port and try again.",
       );
     }
 
     // Create and start server
     webappServer = createOpenscanServer();
-    await webappServer.listen(false); // Non-blocking
+    await webappServer.listen();
 
     const webappUrl = webappServer.getWebappUrl()!;
 
@@ -181,11 +181,17 @@ export default async (): Promise<Partial<NetworkHooks>> => {
  */
 const cleanup = async () => {
   if (webappServer) {
-    webappServer.stop();
+    await webappServer.stop();
     webappServer = null;
   }
 };
 
-process.on("SIGINT", cleanup);
-process.on("SIGTERM", cleanup);
-process.on("exit", cleanup);
+process.on("SIGINT", () => {
+  void cleanup();
+});
+process.on("SIGTERM", () => {
+  void cleanup();
+});
+process.on("exit", () => {
+  void cleanup();
+});
