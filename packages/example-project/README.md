@@ -17,12 +17,20 @@ Start the node:
 pnpm hardhat node
 ```
 
-Then, you can run scripts:
+This will:
+
+- Start the Hardhat development node on port 8545
+- Automatically launch the OpenScan Explorer on <http://localhost:3030>
+- Open your browser to the explorer interface
+
+Then, you can run scripts in a separate terminal:
 
 ```sh
-pnpm run deploy 
+pnpm run deploy
 pnpm run send-tx
 ```
+
+All transactions will be logged with clickable OpenScan links in the console
 
 ## What's inside the project?
 

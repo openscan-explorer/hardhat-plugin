@@ -28,7 +28,11 @@ cd packages/example-project
 pnpm hardhat node
 ```
 
-This node, should log extra information to openScan debugger.
+This will automatically:
+
+- Launch the OpenScan Explorer webapp on <http://localhost:3030>
+- Open your browser to the explorer
+- Log transaction links with OpenScan URLs
 
 ![OpenScan hardhat logs](image.png)
 
