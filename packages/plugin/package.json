@@ -22,7 +22,9 @@
     "eslint": "eslint \"src/**/*.ts\"",
     "prettier": "prettier \"**/*.{ts,js,md,json}\"",
     "build": "tsc --build .",
+    "postbuild": "node -e \"require('fs').cpSync('src/explorer/dist', 'dist/explorer', {recursive: true})\"",
     "prepublishOnly": "pnpm build",
+    "prebuild": "pnpm clean",
     "clean": "rimraf dist",
     "watch": "tsc --build . --watch"
   },

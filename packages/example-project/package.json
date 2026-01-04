@@ -6,9 +6,8 @@
   "scripts": {
     "build": "tsc --build",
     "watch": "tsc --build . --watch",
-    "node": "hardhat run scripts/run-node.ts",
     "deploy": "hardhat run scripts/deploy.ts",
-    "send-tx": "hardhat run scripts/send-transactions.ts --"
+    "send-tx": "hardhat run scripts/send-transactions.ts"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
