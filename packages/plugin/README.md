@@ -14,11 +14,19 @@ In your `hardhat.config.ts` file, import the plugin and add it to the `plugins` 
 
 ```ts
 import { defineConfig } from "hardhat/config";
-import myPlugin from "openscan-hardhat-links";
+import openScanPlugin from "openscan-hardhat-links";
 
 export default defineConfig({
-  plugins: [myPlugin],
+  plugins: [openScanPlugin],
+  networks: {
+    ...
+  },
+  openScan: {
+    url: "http://localhost:3030",
+    chainId: 31337,
+  },
 });
+
 ```
 
 ## Features
@@ -46,29 +54,6 @@ npx hardhat node
 
 The OpenScan Explorer will automatically launch and your browser will open to the explorer interface. All subsequent transactions will include OpenScan links in the console output
 
-### Configuration
-
-The plugin works out of the box with zero configuration required. The following settings are hardcoded:
-
-- **Port**: 3030 (fixed, not configurable)
-- **Auto-open browser**: Always enabled
-- **Webapp path**: Automatically detected from plugin installation
-
-You can optionally configure the OpenScan URL and chain ID if you want to customize the link format:
-
-```ts
-import { defineConfig } from "hardhat/config";
-import myPlugin from "openscan-hardhat-links";
-
-export default defineConfig({
-  plugins: [myPlugin],
-  openScan: {
-    url: "http://localhost:3030", // Optional: default is http://localhost:3030
-    chainId: 31337, // Optional: default is 31337
-  },
-});
-```
-
 ## How It Works
 
 ### Webapp Launch
@@ -90,23 +75,16 @@ The plugin uses the `onRequest` network hook to intercept all JSON-RPC requests.
 ## Requirements
 
 - Hardhat 3.x
-- Node.js 18+
+- Node.js 24+
 - Port 3030 must be available
 
 ## Troubleshooting
 
-### Port 3030 Already in Use
+### Port 8545 or 3030 Already in Use
 
-If you see an error about port 3030 being in use, you need to free up that port:
+If you see an error about port 8545 or 3030 being in use, you need to free up that port:
 
 ```bash
-# Find process using port 3030
-lsof -i:3030
-
-# Kill the process
-kill -9 <PID>
+kill -9 $(lsof -t -i:8545)
+kill -9 $(lsof -t -i:3030)
 ```
-
-### Browser Doesn't Open Automatically
-
-The plugin attempts to open your default browser automatically. If this fails, you can manually navigate to <http://localhost:3030>.
