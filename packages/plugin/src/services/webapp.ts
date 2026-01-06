@@ -32,6 +32,7 @@ const MIME_TYPES: Record<string, string> = {
 export class WebappService extends Service {
   private distPath: string;
   private server: http.Server | null = null;
+  private connections: Set<unknown> = new Set();
 
   constructor(distPath: string) {
     super();
@@ -63,6 +64,14 @@ export class WebappService extends Service {
         this.handleRequest(req, res);
       });
 
+      // Track connections for clean shutdown
+      this.server.on("connection", (conn) => {
+        this.connections.add(conn);
+        conn.on("close", () => {
+          this.connections.delete(conn);
+        });
+      });
+
       // Handle server errors
       this.server.on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {
@@ -91,6 +100,14 @@ export class WebappService extends Service {
   async stop(): Promise<void> {
     if (this.server) {
       return new Promise((resolve) => {
+        // Force close all active connections
+        for (const conn of this.connections) {
+          // @ts-expect-error -- conn is of type unknown
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+          conn.destroy();
+        }
+        this.connections.clear();
+
         this.server!.close(() => {
           console.log("[openscan] Webapp server stopped");
           this.server = null;

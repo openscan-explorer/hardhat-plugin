@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import type { HookContext, NetworkHooks } from "hardhat/types/hooks";
 import { ChainType, NetworkConnection } from "hardhat/types/network";
 import { createOpenscanServer, type OpenscanServer } from "../server.js";
@@ -186,12 +187,23 @@ const cleanup = async () => {
   }
 };
 
-process.on("SIGINT", () => {
-  void cleanup();
+// Track if cleanup is in progress to prevent multiple cleanup calls
+let cleanupInProgress = false;
+
+// Handle SIGINT (Ctrl+C)
+process.on("SIGINT", async () => {
+  if (cleanupInProgress) return;
+  cleanupInProgress = true;
+
+  await cleanup();
+  process.exit(0);
 });
-process.on("SIGTERM", () => {
-  void cleanup();
-});
-process.on("exit", () => {
-  void cleanup();
+
+// Handle SIGTERM
+process.on("SIGTERM", async () => {
+  if (cleanupInProgress) return;
+  cleanupInProgress = true;
+
+  await cleanup();
+  process.exit(0);
 });
