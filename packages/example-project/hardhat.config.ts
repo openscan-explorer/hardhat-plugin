@@ -1,8 +1,8 @@
 import { defineConfig } from "hardhat/config";
-import myPlugin from "openscan-hardhat-links";
+import openScanPlugin from "openscan-hardhat-links";
 
 export default defineConfig({
-  plugins: [myPlugin],
+  plugins: [openScanPlugin],
   solidity: "0.8.29",
   networks: {
     localhost: {
