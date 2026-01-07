@@ -1,7 +1,7 @@
 {
-  "name": "openscan-hardhat-links",
+  "name": "@openscan/hardhat-plugin",
   "version": "0.0.7",
-  "description": "Hardhat 3 plugin to display OpenScan links",
+  "description": "Hardhat 3 plugin to use openscan explorer",
   "license": "MIT",
   "type": "module",
   "types": "dist/src/index.d.ts",
