@@ -1,6 +1,6 @@
 {
   "name": "openscan-hardhat-links",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Hardhat 3 plugin to display OpenScan links",
   "license": "MIT",
   "type": "module",
