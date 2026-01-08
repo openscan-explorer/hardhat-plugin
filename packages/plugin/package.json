@@ -1,6 +1,6 @@
 {
   "name": "@openscan/hardhat-plugin",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "description": "Hardhat 3 plugin to use openscan explorer",
   "license": "MIT",
   "type": "module",
