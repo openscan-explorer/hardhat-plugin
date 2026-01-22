@@ -1,5 +1,5 @@
 import { defineConfig } from "hardhat/config";
-import openScanPlugin from "openscan-hardhat-links";
+import openScanPlugin from "@openscan/hardhat-plugin";
 
 export default defineConfig({
   plugins: [openScanPlugin],
