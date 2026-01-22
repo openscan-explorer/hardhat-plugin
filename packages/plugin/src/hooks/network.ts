@@ -87,20 +87,20 @@ export default async (): Promise<Partial<NetworkHooks>> => {
         )?.[0];
 
         if (txHash) {
-          const txUrl = `${url}/${chainId}/tx/${txHash}`;
+          const txUrl = `${url}/#/${chainId}/tx/${txHash}`;
           console.log(
             `${"  Transaction:".padEnd(18)}${createClickableLink(txUrl)}`,
           );
 
           if (txParams?.from) {
-            const fromUrl = `${url}/${chainId}/address/${txParams.from}`;
+            const fromUrl = `${url}/#/${chainId}/address/${txParams.from}`;
             console.log(
               `${"  From:".padEnd(18)}${createClickableLink(fromUrl)}`,
             );
           }
 
           if (txParams?.to) {
-            const toUrl = `${url}/${chainId}/address/${txParams.to}`;
+            const toUrl = `${url}/#/${chainId}/address/${txParams.to}`;
             console.log(`${"  To:".padEnd(18)}${createClickableLink(toUrl)}`);
           }
         }
@@ -127,9 +127,9 @@ export default async (): Promise<Partial<NetworkHooks>> => {
           const txHash = receipt.transactionHash;
           const blockNumber = parseInt(receipt.blockNumber, 16);
 
-          const txUrl = `${url}/${chainId}/tx/${txHash}`;
-          const blockUrl = `${url}/${chainId}/block/${blockNumber}`;
-          const fromUrl = `${url}/${chainId}/address/${receipt.from}`;
+          const txUrl = `${url}/#/${chainId}/tx/${txHash}`;
+          const blockUrl = `${url}/#/${chainId}/block/${blockNumber}`;
+          const fromUrl = `${url}/#/${chainId}/address/${receipt.from}`;
 
           console.log(
             `${"  Transaction:".padEnd(18)}${createClickableLink(txUrl)}`,
@@ -140,13 +140,13 @@ export default async (): Promise<Partial<NetworkHooks>> => {
           console.log(`${"  From:".padEnd(18)}${createClickableLink(fromUrl)}`);
 
           if (receipt.to) {
-            const toUrl = `${url}/${chainId}/address/${receipt.to}`;
+            const toUrl = `${url}/#/${chainId}/address/${receipt.to}`;
             console.log(`${"  To:".padEnd(18)}${createClickableLink(toUrl)}`);
           }
 
           // If this is a contract deployment, also log the contract address
           if (receipt.contractAddress) {
-            const contractUrl = `${url}/${chainId}/address/${receipt.contractAddress}`;
+            const contractUrl = `${url}/#/${chainId}/address/${receipt.contractAddress}`;
             console.log(
               `${"  Contract:".padEnd(18)}${createClickableLink(contractUrl)}`,
             );
@@ -163,7 +163,7 @@ export default async (): Promise<Partial<NetworkHooks>> => {
         if (accounts && Array.isArray(accounts) && accounts.length > 0) {
           accounts.forEach((address: string, index: number) => {
             const label = `  [${index}]:`.padEnd(18);
-            const addressUrl = `${url}/${chainId}/address/${address}`;
+            const addressUrl = `${url}/#/${chainId}/address/${address}`;
             console.log(`${label}${createClickableLink(addressUrl)}`);
           });
           console.log();
