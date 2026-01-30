@@ -19,6 +19,8 @@ export type AddressMap = Record<string, ArtifactData>;
 
 const CHAIN_ID = 31337;
 
+let hasLoggedArtifacts = false;
+
 export function findIgnitionDeployment(
   projectRoot: string,
 ): string | null {
@@ -158,5 +160,22 @@ export function loadIgnitionArtifacts(
   if (!deploymentPath) {
     return null;
   }
-  return loadArtifacts(deploymentPath, projectRoot);
+
+  const shouldLog = !hasLoggedArtifacts;
+  if (shouldLog) {
+    hasLoggedArtifacts = true;
+    console.log(
+      `[openscan] Found Ignition deployment at: ${deploymentPath}`,
+    );
+  }
+
+  const result = loadArtifacts(deploymentPath, projectRoot);
+
+  if (shouldLog) {
+    console.log(
+      `[openscan] Loaded ${Object.keys(result).length} contract artifacts`,
+    );
+  }
+
+  return result;
 }
