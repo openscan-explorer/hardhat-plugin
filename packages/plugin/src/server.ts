@@ -1,6 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { WebappService } from "./services/index.js";
+import { loadIgnitionArtifacts } from "./artifacts.js";
+import type { DeploymentTracker } from "./deployment-tracker.js";
 
 /**
  * OpenscanServer interface - manages webapp lifecycle
@@ -40,7 +42,9 @@ export interface OpenscanServer {
  * Fixed port: 3030
  * Always auto-opens browser
  */
-export function createOpenscanServer(): OpenscanServer {
+export function createOpenscanServer(
+  tracker: DeploymentTracker,
+): OpenscanServer {
   let webappService: WebappService | null = null;
 
   // Resolve dist path from @openscan/explorer package
@@ -49,14 +53,25 @@ export function createOpenscanServer(): OpenscanServer {
   );
   const distPath = path.dirname(explorerPkg);
 
+  // Project root for finding Ignition deployments
+  const projectRoot = process.cwd();
+
+  // Compose artifact loader from both Ignition deployments and tracked raw deploys
+  const artifactLoader = () => {
+    const ignitionArtifacts = loadIgnitionArtifacts(projectRoot) ?? {};
+    const trackedArtifacts = tracker.getArtifacts();
+    const combined = { ...ignitionArtifacts, ...trackedArtifacts };
+    return Object.keys(combined).length > 0 ? combined : null;
+  };
+
   return {
     services() {
       return { webappService };
     },
 
     async listen() {
-      // Create webapp service
-      webappService = new WebappService(distPath);
+      // Create webapp service with artifact injection
+      webappService = new WebappService(distPath, artifactLoader);
 
       // Start service (will throw if fails - fail fast strategy)
       await webappService.start();
