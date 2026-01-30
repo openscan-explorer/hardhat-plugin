@@ -36,8 +36,8 @@ importers:
   packages/plugin:
     dependencies:
       '@openscan/explorer':
-        specifier: ^1.1.0-alpha
-        version: 1.1.0-alpha
+        specifier: 1.1.1-alpha
+        version: 1.1.1-alpha
     devDependencies:
       '@eslint/js':
         specifier: ^9.35.0
@@ -452,8 +452,8 @@ packages:
     resolution: {integrity: sha512-q4n32/FNKIhQ3zQGGw5CvPF6GTvDCpYwIf7bEY/dZTZbgfDsHyjJwURxUJf3VQuuJj+fDIFl4+KkBVbw4Ef6jA==}
     engines: {node: '>= 12'}
 
-  '@openscan/explorer@1.1.0-alpha':
-    resolution: {integrity: sha512-fTzZbap/mdCivNGAE7vKXfKovt+WbnoUPgrCi5V1vleArSvF5Tc/aKoP5LRPOtiY3qvejcY5cYopp3f/GBGOFw==}
+  '@openscan/explorer@1.1.1-alpha':
+    resolution: {integrity: sha512-IkcGK89T+nXKJgtbxPjoVS3VIG0ps6ont0qvRq9VFgpHhE7460S9PqvA8E+PyC9mnzNa7pR8Nw50VWGNhsbihg==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -2164,7 +2164,7 @@ snapshots:
       '@nomicfoundation/solidity-analyzer-linux-x64-musl': 0.1.2
       '@nomicfoundation/solidity-analyzer-win32-x64-msvc': 0.1.2
 
-  '@openscan/explorer@1.1.0-alpha': {}
+  '@openscan/explorer@1.1.1-alpha': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
