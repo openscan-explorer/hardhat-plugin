@@ -46,13 +46,35 @@ This plugin provides two main features:
 
 ## Usage
 
-Simply start your Hardhat node:
+### 1. Start the node
 
 ```bash
 npx hardhat node
 ```
 
-The OpenScan Explorer will automatically launch and your browser will open to the explorer interface. All subsequent transactions will include OpenScan links in the console output
+The OpenScan Explorer will automatically launch and your browser will open to the explorer interface.
+
+### 2. Deploy contracts with Ignition
+
+In a separate terminal:
+
+```bash
+npx hardhat ignition deploy ignition/modules/Counter.ts --network localhost
+```
+
+### 3. Deploy contracts with script
+
+```bash
+npx hardhat run scripts/deploy.ts --network localhost
+```
+
+### 4. Send transactions with script
+
+```bash
+npx hardhat run scripts/send-tx.ts --network localhost
+```
+
+All transactions will be logged with clickable OpenScan links in the console. Check that the code is verified
 
 ## How It Works
 

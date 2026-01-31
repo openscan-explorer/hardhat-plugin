@@ -1,6 +1,7 @@
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
+import type { AddressMap } from "../artifacts.js";
 import { Service } from "./base.js";
 
 /**
@@ -29,14 +30,18 @@ const MIME_TYPES: Record<string, string> = {
  * No external dependencies - uses only Node.js built-in modules
  * Fixed port: 3030
  */
+type ArtifactLoader = () => AddressMap | null;
+
 export class WebappService extends Service {
   private distPath: string;
   private server: http.Server | null = null;
   private connections: Set<unknown> = new Set();
+  private artifactLoader: ArtifactLoader | null;
 
-  constructor(distPath: string) {
+  constructor(distPath: string, artifactLoader?: ArtifactLoader) {
     super();
     this.distPath = distPath;
+    this.artifactLoader = artifactLoader ?? null;
   }
 
   /**
@@ -192,6 +197,43 @@ export class WebappService extends Service {
   }
 
   /**
+   * Inject artifact data into HTML by adding a script that writes to localStorage.
+   * Called on each HTML request so artifacts are always fresh from disk.
+   */
+  private injectArtifactsScript(html: string): string {
+    if (!this.artifactLoader) {
+      return html;
+    }
+
+    let artifacts: AddressMap | null;
+    try {
+      artifacts = this.artifactLoader();
+    } catch (error) {
+      console.warn("[openscan] Failed to load artifacts:", error);
+      return html;
+    }
+
+    if (!artifacts || Object.keys(artifacts).length === 0) {
+      return html;
+    }
+
+    // Double-encode: first JSON.stringify produces the data string,
+    // second wraps it as a safe JS string literal with proper escaping.
+    const jsonString = JSON.stringify(JSON.stringify(artifacts));
+
+    // Escape </script> to prevent premature tag closure
+    const safeJsonString = jsonString.replace(/<\/script>/gi, "<\\/script>");
+
+    const scriptTag =
+      `<script>` +
+      `try{localStorage.setItem("OPENSCAN_ARTIFACTS_JSON_V1",${safeJsonString})}` +
+      `catch(e){console.warn("[openscan] Failed to inject artifacts:",e)}` +
+      `</script>`;
+
+    return html.replace("<body>", `<body>${scriptTag}`);
+  }
+
+  /**
    * Serve a file with proper MIME type and caching headers
    */
   private serveFile(
@@ -206,12 +248,23 @@ export class WebappService extends Service {
         return;
       }
 
+      // Inject artifacts into HTML responses
+      let responseBody: string | Buffer = data;
+      if (ext === ".html") {
+        responseBody = this.injectArtifactsScript(data.toString("utf-8"));
+      }
+
+      const contentLength =
+        typeof responseBody === "string"
+          ? Buffer.byteLength(responseBody, "utf-8")
+          : responseBody.length;
+
       const mimeType = MIME_TYPES[ext] || "application/octet-stream";
 
       // Set cache headers for better performance
       const headers: Record<string, string> = {
         "Content-Type": mimeType,
-        "Content-Length": String(data.length),
+        "Content-Length": String(contentLength),
       };
 
       // Cache static assets for 1 hour, but not HTML (for SPA updates)
@@ -222,7 +275,7 @@ export class WebappService extends Service {
       }
 
       res.writeHead(200, headers);
-      res.end(data);
+      res.end(responseBody);
     });
   }
 

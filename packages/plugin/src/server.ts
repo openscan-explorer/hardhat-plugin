@@ -1,9 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { WebappService } from "./services/index.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { loadIgnitionArtifacts } from "./artifacts.js";
+import type { DeploymentTracker } from "./deployment-tracker.js";
 
 /**
  * OpenscanServer interface - manages webapp lifecycle
@@ -40,16 +39,30 @@ export interface OpenscanServer {
 
 /**
  * Create an OpenscanServer instance
- * Fixed dist path: packages/explorer/dist
  * Fixed port: 3030
  * Always auto-opens browser
  */
-export function createOpenscanServer(): OpenscanServer {
+export function createOpenscanServer(
+  tracker: DeploymentTracker,
+): OpenscanServer {
   let webappService: WebappService | null = null;
 
-  // Fixed dist path relative to plugin location
-  // When compiled: packages/plugin/dist/src/server.js -> packages/plugin/dist/explorer
-  const distPath = path.resolve(__dirname, "../explorer");
+  // Resolve dist path from @openscan/explorer package
+  const explorerPkg = fileURLToPath(
+    import.meta.resolve("@openscan/explorer/package.json"),
+  );
+  const distPath = path.dirname(explorerPkg);
+
+  // Project root for finding Ignition deployments
+  const projectRoot = process.cwd();
+
+  // Compose artifact loader from both Ignition deployments and tracked raw deploys
+  const artifactLoader = () => {
+    const ignitionArtifacts = loadIgnitionArtifacts(projectRoot) ?? {};
+    const trackedArtifacts = tracker.getArtifacts();
+    const combined = { ...ignitionArtifacts, ...trackedArtifacts };
+    return Object.keys(combined).length > 0 ? combined : null;
+  };
 
   return {
     services() {
@@ -57,8 +70,8 @@ export function createOpenscanServer(): OpenscanServer {
     },
 
     async listen() {
-      // Create webapp service
-      webappService = new WebappService(distPath);
+      // Create webapp service with artifact injection
+      webappService = new WebappService(distPath, artifactLoader);
 
       // Start service (will throw if fails - fail fast strategy)
       await webappService.start();

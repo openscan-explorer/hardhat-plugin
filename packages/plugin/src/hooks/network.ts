@@ -2,6 +2,7 @@
 import type { HookContext, NetworkHooks } from "hardhat/types/hooks";
 import { ChainType, NetworkConnection } from "hardhat/types/network";
 import { createOpenscanServer, type OpenscanServer } from "../server.js";
+import { DeploymentTracker } from "../deployment-tracker.js";
 import { isPortAvailable, openBrowser } from "../utils.js";
 
 // Helper function to create clickable terminal links
@@ -11,9 +12,10 @@ function createClickableLink(url: string, text?: string): string {
   return `\x1b]8;;${url}\x1b\\${displayText}\x1b]8;;\x1b\\`;
 }
 
-// Module-level state for webapp server
+// Module-level state for webapp server and deployment tracking
 let webappServer: OpenscanServer | null = null;
 let webappStarted = false;
+let tracker: DeploymentTracker | null = null;
 
 /**
  * Start the webapp server
@@ -21,7 +23,7 @@ let webappStarted = false;
  * - Starts server
  * - Auto-opens browser
  */
-async function startWebapp(chainId: number) {
+async function startWebapp() {
   try {
     // Check if port 3030 is available (fail fast)
     const portAvailable = await isPortAvailable();
@@ -31,14 +33,12 @@ async function startWebapp(chainId: number) {
       );
     }
 
-    // Create and start server
-    webappServer = createOpenscanServer();
+    // Create deployment tracker and start server
+    tracker = new DeploymentTracker(process.cwd());
+    webappServer = createOpenscanServer(tracker);
     await webappServer.listen();
 
     const webappUrl = webappServer.getWebappUrl()!;
-
-    console.log(`\n🔍 OpenScan Explorer: ${createClickableLink(webappUrl)}`);
-    console.log(`   Network: Chain ID ${chainId}\n`);
 
     // Auto-open browser (always enabled)
     await openBrowser(webappUrl);
@@ -59,13 +59,11 @@ export default async (): Promise<Partial<NetworkHooks>> => {
     ): Promise<NetworkConnection<ChainTypeT>> {
       const connection = await next(context);
 
-      const { chainId } = context.config.openScan;
-
       // Start webapp on first connection (when Hardhat node starts)
       // The network name is "default" for the built-in Hardhat network
       if (!webappStarted && connection.networkName === "default") {
         webappStarted = true;
-        await startWebapp(chainId);
+        await startWebapp();
       }
 
       return connection;
@@ -87,20 +85,25 @@ export default async (): Promise<Partial<NetworkHooks>> => {
         )?.[0];
 
         if (txHash) {
-          const txUrl = `${url}/${chainId}/tx/${txHash}`;
+          // Track contract deployments (no "to" address means deployment)
+          if (tracker && txParams?.data && !txParams.to) {
+            tracker.trackSendTransaction(txHash, txParams.data);
+          }
+
+          const txUrl = `${url}/#/${chainId}/tx/${txHash}`;
           console.log(
             `${"  Transaction:".padEnd(18)}${createClickableLink(txUrl)}`,
           );
 
           if (txParams?.from) {
-            const fromUrl = `${url}/${chainId}/address/${txParams.from}`;
+            const fromUrl = `${url}/#/${chainId}/address/${txParams.from}`;
             console.log(
               `${"  From:".padEnd(18)}${createClickableLink(fromUrl)}`,
             );
           }
 
           if (txParams?.to) {
-            const toUrl = `${url}/${chainId}/address/${txParams.to}`;
+            const toUrl = `${url}/#/${chainId}/address/${txParams.to}`;
             console.log(`${"  To:".padEnd(18)}${createClickableLink(toUrl)}`);
           }
         }
@@ -127,9 +130,9 @@ export default async (): Promise<Partial<NetworkHooks>> => {
           const txHash = receipt.transactionHash;
           const blockNumber = parseInt(receipt.blockNumber, 16);
 
-          const txUrl = `${url}/${chainId}/tx/${txHash}`;
-          const blockUrl = `${url}/${chainId}/block/${blockNumber}`;
-          const fromUrl = `${url}/${chainId}/address/${receipt.from}`;
+          const txUrl = `${url}/#/${chainId}/tx/${txHash}`;
+          const blockUrl = `${url}/#/${chainId}/block/${blockNumber}`;
+          const fromUrl = `${url}/#/${chainId}/address/${receipt.from}`;
 
           console.log(
             `${"  Transaction:".padEnd(18)}${createClickableLink(txUrl)}`,
@@ -140,13 +143,17 @@ export default async (): Promise<Partial<NetworkHooks>> => {
           console.log(`${"  From:".padEnd(18)}${createClickableLink(fromUrl)}`);
 
           if (receipt.to) {
-            const toUrl = `${url}/${chainId}/address/${receipt.to}`;
+            const toUrl = `${url}/#/${chainId}/address/${receipt.to}`;
             console.log(`${"  To:".padEnd(18)}${createClickableLink(toUrl)}`);
           }
 
-          // If this is a contract deployment, also log the contract address
+          // If this is a contract deployment, track it and log the contract address
           if (receipt.contractAddress) {
-            const contractUrl = `${url}/${chainId}/address/${receipt.contractAddress}`;
+            if (tracker) {
+              tracker.trackDeploymentReceipt(txHash, receipt.contractAddress);
+            }
+
+            const contractUrl = `${url}/#/${chainId}/address/${receipt.contractAddress}`;
             console.log(
               `${"  Contract:".padEnd(18)}${createClickableLink(contractUrl)}`,
             );
@@ -163,7 +170,7 @@ export default async (): Promise<Partial<NetworkHooks>> => {
         if (accounts && Array.isArray(accounts) && accounts.length > 0) {
           accounts.forEach((address: string, index: number) => {
             const label = `  [${index}]:`.padEnd(18);
-            const addressUrl = `${url}/${chainId}/address/${address}`;
+            const addressUrl = `${url}/#/${chainId}/address/${address}`;
             console.log(`${label}${createClickableLink(addressUrl)}`);
           });
           console.log();

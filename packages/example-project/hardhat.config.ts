@@ -1,8 +1,9 @@
 import { defineConfig } from "hardhat/config";
-import openScanPlugin from "openscan-hardhat-links";
+import openScanPlugin from "@openscan/hardhat-plugin";
+import hardhatIgnitionViemPlugin from "@nomicfoundation/hardhat-ignition-viem";
 
 export default defineConfig({
-  plugins: [openScanPlugin],
+  plugins: [hardhatIgnitionViemPlugin, openScanPlugin],
   solidity: "0.8.29",
   networks: {
     localhost: {

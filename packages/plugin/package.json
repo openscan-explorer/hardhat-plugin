@@ -1,6 +1,6 @@
 {
   "name": "@openscan/hardhat-plugin",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "description": "Hardhat 3 plugin to use openscan explorer",
   "license": "MIT",
   "type": "module",
@@ -22,7 +22,6 @@
     "eslint": "eslint \"src/**/*.ts\"",
     "prettier": "prettier \"**/*.{ts,js,md,json}\"",
     "build": "tsc --build .",
-    "postbuild": "node -e \"require('fs').cpSync('src/explorer/dist', 'dist/explorer', {recursive: true})\"",
     "prepublishOnly": "pnpm build",
     "prebuild": "pnpm clean",
     "clean": "rimraf dist",
@@ -30,12 +29,14 @@
   },
   "files": [
     "dist/src/",
-    "dist/explorer/",
     "src/",
     "CHANGELOG.md",
     "LICENSE",
     "README.md"
   ],
+  "dependencies": {
+    "@openscan/explorer": "1.1.1-alpha"
+  },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@nomicfoundation/hardhat-node-test-reporter": "^3.0.0",
@@ -45,7 +46,7 @@
     "eslint": "^9.35.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
-    "hardhat": "^3.0.11",
+    "hardhat": "^3.1.5",
     "prettier": "3.6.2",
     "rimraf": "^5.0.5",
     "tsx": "^4.19.3",
@@ -53,7 +54,7 @@
     "typescript-eslint": "^8.43.0"
   },
   "peerDependencies": {
-    "hardhat": "^3.0.11"
+    "hardhat": "^3.1.5"
   },
   "publishConfig": {
     "access": "public"
