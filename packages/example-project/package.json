@@ -12,6 +12,7 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-ignition-viem": "^3.0.7",
     "@nomicfoundation/hardhat-ignition": "^3.0.5",
+    "@nomicfoundation/ignition-core": "^3.0.7",
     "@openscan/hardhat-plugin": "workspace:*",
     "@tsconfig/node22": "^22.0.2",
     "@types/node": "^22.11.0",
