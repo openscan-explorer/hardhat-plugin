@@ -11,7 +11,9 @@ pnpm install
 pnpm build
 ```
 
-Start the node:
+## Testing
+
+### 1. Start the node
 
 ```sh
 pnpm hardhat node
@@ -23,14 +25,27 @@ This will:
 - Automatically launch the OpenScan Explorer on <http://localhost:3030>
 - Open your browser to the explorer interface
 
-Then, you can run scripts in a separate terminal:
+### 2. Deploy contracts with Ignition
+
+In a separate terminal:
+
+```sh
+pnpm hardhat ignition deploy ignition/modules/Counter.ts --network localhost
+```
+
+### 3. Deploy contracts with script
 
 ```sh
 pnpm run deploy
+```
+
+### 4. Send transactions with script
+
+```sh
 pnpm run send-tx
 ```
 
-All transactions will be logged with clickable OpenScan links in the console
+All transactions will be logged with clickable OpenScan links in the console. Check the code is verified
 
 ## What's inside the project?
 
