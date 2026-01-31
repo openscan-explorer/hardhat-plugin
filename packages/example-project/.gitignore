@@ -10,3 +10,4 @@
 # Hardhat files
 /artifacts
 /cache
+/ignition
