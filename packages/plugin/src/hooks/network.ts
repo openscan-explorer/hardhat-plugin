@@ -150,10 +150,7 @@ export default async (): Promise<Partial<NetworkHooks>> => {
           // If this is a contract deployment, track it and log the contract address
           if (receipt.contractAddress) {
             if (tracker) {
-              tracker.trackDeploymentReceipt(
-                txHash,
-                receipt.contractAddress,
-              );
+              tracker.trackDeploymentReceipt(txHash, receipt.contractAddress);
             }
 
             const contractUrl = `${url}/#/${chainId}/address/${receipt.contractAddress}`;

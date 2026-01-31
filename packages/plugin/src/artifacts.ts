@@ -21,9 +21,7 @@ const CHAIN_ID = 31337;
 
 let hasLoggedArtifacts = false;
 
-export function findIgnitionDeployment(
-  projectRoot: string,
-): string | null {
+export function findIgnitionDeployment(projectRoot: string): string | null {
   const deploymentPath = path.join(
     projectRoot,
     "ignition",
@@ -93,9 +91,10 @@ export function loadArtifacts(
 
     let artifact: Record<string, unknown>;
     try {
-      artifact = JSON.parse(
-        readFileSync(artifactPath, "utf-8"),
-      ) as Record<string, unknown>;
+      artifact = JSON.parse(readFileSync(artifactPath, "utf-8")) as Record<
+        string,
+        unknown
+      >;
     } catch {
       continue;
     }
@@ -153,9 +152,7 @@ export function loadArtifacts(
   return addressMap;
 }
 
-export function loadIgnitionArtifacts(
-  projectRoot: string,
-): AddressMap | null {
+export function loadIgnitionArtifacts(projectRoot: string): AddressMap | null {
   const deploymentPath = findIgnitionDeployment(projectRoot);
   if (!deploymentPath) {
     return null;
@@ -164,9 +161,7 @@ export function loadIgnitionArtifacts(
   const shouldLog = !hasLoggedArtifacts;
   if (shouldLog) {
     hasLoggedArtifacts = true;
-    console.log(
-      `[openscan] Found Ignition deployment at: ${deploymentPath}`,
-    );
+    console.log(`[openscan] Found Ignition deployment at: ${deploymentPath}`);
   }
 
   const result = loadArtifacts(deploymentPath, projectRoot);

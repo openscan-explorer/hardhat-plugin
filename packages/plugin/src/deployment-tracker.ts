@@ -29,11 +29,7 @@ export class DeploymentTracker {
    * Scan Hardhat's artifacts/contracts/ directory for compiled contract artifacts.
    */
   private loadCompiledArtifacts(): void {
-    const artifactsDir = path.join(
-      this.projectRoot,
-      "artifacts",
-      "contracts",
-    );
+    const artifactsDir = path.join(this.projectRoot, "artifacts", "contracts");
     if (!existsSync(artifactsDir)) return;
     this.scanDir(artifactsDir);
   }
@@ -135,9 +131,7 @@ export class DeploymentTracker {
     this.trackedDeployments[contractAddress.toLowerCase()] = entry;
   }
 
-  private findMatchingArtifact(
-    creationData: string,
-  ): CompiledArtifact | null {
+  private findMatchingArtifact(creationData: string): CompiledArtifact | null {
     const normalizedData = creationData.toLowerCase();
     for (const artifact of this.compiledArtifacts) {
       const normalizedBytecode = artifact.bytecode.toLowerCase();
