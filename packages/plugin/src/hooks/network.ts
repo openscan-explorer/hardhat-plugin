@@ -60,8 +60,7 @@ export default async (): Promise<Partial<NetworkHooks>> => {
       const connection = await next(context);
 
       // Start webapp on first connection (when Hardhat node starts)
-      // The network name is "default" for the built-in Hardhat network
-      if (!webappStarted && connection.networkName === "default") {
+      if (!webappStarted) {
         webappStarted = true;
         await startWebapp();
       }
