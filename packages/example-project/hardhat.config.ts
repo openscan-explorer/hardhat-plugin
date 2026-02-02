@@ -6,6 +6,13 @@ export default defineConfig({
   plugins: [hardhatIgnitionViemPlugin, openScanPlugin],
   solidity: "0.8.29",
   networks: {
+    hardhatBlocks: {
+      type: "edr-simulated",
+      mining: {
+        auto: false,
+        interval: 5000,
+      }
+    },
     localhost: {
       type: "http",
       url: "http://127.0.0.1:8545",
