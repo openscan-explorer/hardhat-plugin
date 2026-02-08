@@ -31,7 +31,7 @@ async function startWebapp() {
       console.warn(
         "[openscan] Warning: Port 3030 is already in use. Explorer not started.",
       );
-      return
+      return;
     }
 
     // Create deployment tracker and start server
