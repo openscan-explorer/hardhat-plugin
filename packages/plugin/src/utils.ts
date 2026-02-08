@@ -32,16 +32,17 @@ export async function isPortAvailable(): Promise<boolean> {
 export async function openBrowser(url: string): Promise<void> {
   const platform = process.platform;
   let command: string;
+  const networkPageUrl = `${url}/#/31337`;
 
   switch (platform) {
     case "darwin": // macOS
-      command = `open "${url}"`;
+      command = `open "${networkPageUrl}"`;
       break;
     case "win32": // Windows
-      command = `start "" "${url}"`;
+      command = `start "" "${networkPageUrl}"`;
       break;
     default: // Linux and others
-      command = `xdg-open "${url}"`;
+      command = `xdg-open "${networkPageUrl}"`;
       break;
   }
 
