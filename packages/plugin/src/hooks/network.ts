@@ -28,9 +28,10 @@ async function startWebapp() {
     // Check if port 3030 is available (fail fast)
     const portAvailable = await isPortAvailable();
     if (!portAvailable) {
-      throw new Error(
-        "Port 3030 is already in use. Please free the port and try again.",
+      console.warn(
+        "[openscan] Warning: Port 3030 is already in use. Explorer not started.",
       );
+      return
     }
 
     // Create deployment tracker and start server
