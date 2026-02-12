@@ -35,7 +35,7 @@
     "README.md"
   ],
   "dependencies": {
-    "@openscan/explorer": "1.1.1-alpha"
+    "@openscan/explorer": "1.2.0-alpha"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
