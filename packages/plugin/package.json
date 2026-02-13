@@ -1,6 +1,6 @@
 {
   "name": "@openscan/hardhat-plugin",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Hardhat 3 plugin to use openscan explorer",
   "license": "MIT",
   "type": "module",
@@ -35,7 +35,7 @@
     "README.md"
   ],
   "dependencies": {
-    "@openscan/explorer": "1.1.1-alpha"
+    "@openscan/explorer": "1.2.0-alpha"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
