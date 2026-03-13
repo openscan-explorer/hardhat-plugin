@@ -86,7 +86,7 @@ export function createOpenscanServer(
     },
 
     getWebappUrl() {
-      return webappService ? `http://localhost:3030` : null;
+      return webappService ? `http://localhost:3030/#/31337` : null;
     },
 
     getWebappPort() {
