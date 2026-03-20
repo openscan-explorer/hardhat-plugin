@@ -1,112 +1,124 @@
-# `openscan-hardhat-links`
+# @openscan/hardhat-plugin
 
-A Hardhat plugin that automatically launches the OpenScan Explorer webapp and adds OpenScan links to all transaction logs.
+A Hardhat 3 plugin that automatically launches the OpenScan Explorer webapp and adds clickable OpenScan links to transaction logs in your terminal.
+
+Learn more at <https://openscan.io>
 
 ## Installation
 
-To install this plugin, run the following command:
-
 ```bash
-npm install --save-dev openscan-hardhat-links
+npm install --save-dev @openscan/hardhat-plugin
 ```
 
-In your `hardhat.config.ts` file, import the plugin and add it to the `plugins` array:
+## Configuration
+
+In your `hardhat.config.ts`, import the plugin and add it to the `plugins` array:
 
 ```ts
+import openScanPlugin from "@openscan/hardhat-plugin";
 import { defineConfig } from "hardhat/config";
-import openScanPlugin from "openscan-hardhat-links";
 
 export default defineConfig({
   plugins: [openScanPlugin],
+  solidity: "0.8.29",
   networks: {
-    ...
+    localhost: {
+      type: "http",
+      url: "http://127.0.0.1:8545",
+    },
   },
   openScan: {
-    url: "http://localhost:3030",
-    chainId: 31337,
+    url: "http://localhost:3030", // default
+    chainId: 31337, // default
   },
 });
-
 ```
+
+### Options
+
+| Option    | Type     | Default                   | Description                      |
+| --------- | -------- | ------------------------- | -------------------------------- |
+| `url`     | `string` | `"http://localhost:3030"` | URL where the explorer is served |
+| `chainId` | `number` | `31337`                   | Chain ID for the explorer links  |
 
 ## Features
 
-This plugin provides two main features:
+### Automatic Explorer Launch
 
-1. **Automatic OpenScan Explorer Launch**: When you start the Hardhat node, the plugin automatically:
-   - Launches a local OpenScan Explorer webapp on port 3030
-   - Opens your default browser to <http://localhost:3030>
-   - Serves the explorer from the plugin's built-in webapp
+When the first network connection is established (e.g. via `npx hardhat node`), the plugin:
 
-2. **OpenScan Links in Logs**: All transaction-related logs include clickable OpenScan links:
-   - Transaction hashes → OpenScan transaction view
-   - Addresses → OpenScan address view
-   - Blocks → OpenScan block view
-   - Contract deployments → OpenScan contract view
+1. Checks if port 3030 is available
+2. Starts a local HTTP server serving the OpenScan Explorer webapp
+3. Opens your default browser to the explorer
+
+The explorer serves contract artifacts (ABIs, source code, deployment addresses) so you can inspect deployed contracts directly in the browser. It supports both Hardhat Ignition deployments and raw deployment scripts.
+
+### Clickable Transaction Links
+
+The plugin intercepts JSON-RPC requests and logs clickable terminal links (via OSC 8 hyperlinks) for:
+
+- **`eth_sendTransaction`** — logs links to the transaction, sender, and recipient addresses
+- **`eth_getTransactionReceipt`** — logs links to the transaction, block, sender, recipient, and deployed contract address (if applicable)
+- **`eth_accounts`** — logs links to each account address
+
+### Contract Deployment Tracking
+
+When contracts are deployed (transactions with no `to` address), the plugin matches the creation bytecode against compiled artifacts in your project. This allows the explorer to display the contract name, ABI, and source code for deployed contracts — even without Hardhat Ignition.
 
 ## Usage
 
-### 1. Start the node
+### 1. Start the Hardhat node
 
 ```bash
 npx hardhat node
 ```
 
-The OpenScan Explorer will automatically launch and your browser will open to the explorer interface.
+The OpenScan Explorer will automatically launch and your browser will open.
 
-### 2. Deploy contracts with Ignition
+### 2. Deploy contracts
 
-In a separate terminal:
+With Hardhat Ignition:
 
 ```bash
 npx hardhat ignition deploy ignition/modules/Counter.ts --network localhost
 ```
 
-### 3. Deploy contracts with script
+Or with a script:
 
 ```bash
 npx hardhat run scripts/deploy.ts --network localhost
 ```
 
-### 4. Send transactions with script
+### 3. Send transactions
 
 ```bash
 npx hardhat run scripts/send-tx.ts --network localhost
 ```
 
-All transactions will be logged with clickable OpenScan links in the console. Check that the code is verified
-
-## How It Works
-
-### Webapp Launch
-
-The plugin hooks into Hardhat's network lifecycle using the `newConnection` hook. When the Hardhat node starts:
-
-1. The hook detects the first network connection
-2. Checks if port 3030 is available (fails fast if not)
-3. Starts a custom HTTP server serving static files from the built-in explorer webapp
-4. Opens your default browser to the explorer URL
-5. Logs a success message with a clickable link
-
-The webapp continues running as long as the Hardhat node is active and automatically cleans up when the node stops.
-
-### Transaction Logging
-
-The plugin uses the `onRequest` network hook to intercept all JSON-RPC requests. For relevant methods (like `eth_sendTransaction`, `eth_getTransactionReceipt`, etc.), it extracts transaction hashes, addresses, and block numbers, then outputs clickable OpenScan links to the console.
+All transactions will be logged with clickable OpenScan links in the terminal.
 
 ## Requirements
 
 - Hardhat 3.x
-- Node.js 24+
-- Port 3030 must be available
+- Node.js 24
+- Port 3030 must be available (the explorer always runs on this port)
 
 ## Troubleshooting
 
-### Port 8545 or 3030 Already in Use
+### Port 3030 Already in Use
 
-If you see an error about port 8545 or 3030 being in use, you need to free up that port:
+If the explorer fails to start, check what is using the port:
 
 ```bash
-kill -9 $(lsof -t -i:8545)
-kill -9 $(lsof -t -i:3030)
+lsof -i :3030
 ```
+
+Then stop the conflicting process, or if it's a leftover Hardhat/OpenScan process:
+
+```bash
+kill $(lsof -t -i:3030)
+```
+
+## License
+
+MIT
