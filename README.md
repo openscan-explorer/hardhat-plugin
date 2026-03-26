@@ -1,78 +1,70 @@
-# Hardhat 3 plugin template
+# @openscan/hardhat-plugin
 
-This repository is a template for creating a Hardhat 3 plugin.
-
-## Getting started
-
-> This repository is structured as a pnpm monorepo, so make sure you have [`pnpm`](https://pnpm.io/) installed first
-
-To get started, clone the repository and run:
-
-```sh
-pnpm install
-pnpm build
-```
-
-This will install all the dependencies and build the plugin.
-
-You can now run the tests of the plugin with:
-
-```sh
-pnpm test
-```
-
-And try the plugin out in `packages/example-project` with:
-
-```sh
-cd packages/example-project
-pnpm hardhat node
-```
-
-This will automatically:
-
-- Launch the OpenScan Explorer webapp on <http://localhost:3030>
-- Open your browser to the explorer
-- Log transaction links with OpenScan URLs
+A Hardhat 3 plugin that automatically launches a local [OpenScan Explorer](https://openscan.eth.link) and adds clickable transaction links to your terminal.
 
 ![OpenScan hardhat logs](image.png)
 
-## Understanding the repository structure
+![OpenScan Call Tree](image-1.png)
 
-### Monorepo structure
+## Features
 
-This repository is structured as a pnpm monorepo with the following packages:
+- **Local block explorer** — auto-launches on `hardhat node` and opens your browser
+- **Clickable terminal links** — transaction hashes, addresses, and blocks are OSC 8 hyperlinks to the explorer
+- **Contract deployment tracking** — matches bytecode to artifacts so the explorer shows contract names, ABIs, and source code
+- **Works with Hardhat Ignition and raw deploy scripts**
 
-- `packages/plugin`: The plugin itself.
-- `packages/example-project`: An example Hardhat 3 project that uses the plugin.
+## Quick Start
 
-All the development will happen in the `packages/plugin` directory, while `packages/example-project` is a playground to experiment with your plugin, and manually test it.
+```bash
+npm install --save-dev @openscan/hardhat-plugin
+```
 
-### Plugin template structure
+Add the plugin to your `hardhat.config.ts`:
 
-The `packages/plugin` directory has a complete plugin example. It includes:
+```ts
+import { defineConfig } from "hardhat/config";
+import openScanPlugin from "@openscan/hardhat-plugin";
 
-- A `README.md` file that documents the plugin.
-- A `src/index.ts` file that defines and exports the plugin.
-- A network Hook Handler, which is in `src/hooks/network.ts`, which shows how to define them, and prints OpenScan links.
 
-### Github Actions setup
+export default defineConfig({
+  plugins: [openScanPlugin],
+  solidity: "0.8.29",
+});
+```
 
-This repository is setup with a Github Actions workflow. You don't need to do anything to set it up, it runs on every push to `main`, on pull requests, and when manually triggered.
+Start a node:
 
-The workflow is equivalent to running this steps in the root of the repository:
+```bash
+npx hardhat node
+```
+
+The OpenScan Explorer will launch at <http://localhost:3030> and your browser will open automatically.
+
+## Documentation
+
+See the [plugin README](packages/plugin/README.md) for full configuration options, usage examples, and troubleshooting.
+
+## Contributing
+
+This repository is a pnpm monorepo. Make sure you have [`pnpm`](https://pnpm.io/) installed.
 
 ```sh
 pnpm install
 pnpm build
 pnpm test
-pnpm lint
 ```
 
-It runs using Node.js 24, on an `ubuntu-latest` runner.
+### Monorepo structure
 
-## Development setup
+- `packages/plugin` — the plugin source code
+- `packages/example-project` — a Hardhat 3 project for manual testing
 
-- This repository includes a setup of typescript and eslint, based on the official recommendation of each project, and a a few custom rules that help building Hardhat plugins.
-- It also includes `prettier` to format the code, with its default configuration.
-- There are npm scripts in the root that should be enough to build, lint, test, etc.
-  - Running `pnpm watch` can be helpful when using the example project. If you keep a terminal running it, things will normally be rebuilt by the time you try them out in `packages/example-project`.
+Running `pnpm watch` in the root is useful during development — it rebuilds the plugin as you edit, so changes are picked up when you test in `packages/example-project`.
+
+### CI
+
+GitHub Actions runs on every push to `main` and on pull requests: install, build, test, and lint using Node.js 24.
+
+## License
+
+MIT

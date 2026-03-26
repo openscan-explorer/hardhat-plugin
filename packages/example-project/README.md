@@ -1,6 +1,6 @@
-# A Hardhat 3 project that uses your plugin
+# A Hardhat 3 project that uses @openscan/hardhat-plugin
 
-This is an example project that uses your plugin.
+This is an example project that uses the OpenScan plugin.
 
 ## Getting started
 
@@ -45,10 +45,10 @@ pnpm run deploy
 pnpm run send-tx
 ```
 
-All transactions will be logged with clickable OpenScan links in the console. Check the code is verified
+All transactions will be logged with clickable OpenScan links in the console.
 
 ## What's inside the project?
 
-This is a minimal Hardhat 3 project that only has the built-in functionality of Hardhat and your plugin.
+This is a minimal Hardhat 3 project that only has the built-in functionality of Hardhat and the OpenScan plugin.
 
-This means that you don't have `ethers,` `viem`, `mocha`, nor the Node.js test runner plugins.
+This means that you don't have `ethers`, `viem`, `mocha`, nor the Node.js test runner plugins.
