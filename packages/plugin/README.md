@@ -2,7 +2,7 @@
 
 A Hardhat 3 plugin that automatically launches the OpenScan Explorer webapp and adds clickable OpenScan links to transaction logs in your terminal.
 
-Learn more at <https://openscan.io>
+Learn more at <https://openscan.eth.link>
 
 ## Installation
 
@@ -101,7 +101,7 @@ All transactions will be logged with clickable OpenScan links in the terminal.
 
 - Hardhat 3.x
 - Node.js 24
-- Port 3030 must be available (the explorer always runs on this port)
+- Port 3030 must be available (the explorer is hardcoded to this port — the `url` option only affects terminal link URLs, not the server port)
 
 ## Troubleshooting
 
