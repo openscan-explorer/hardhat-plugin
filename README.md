@@ -54,6 +54,8 @@ pnpm build
 pnpm test
 ```
 
+`pnpm install` also activates the repo's git hooks, which enforce the branch and commit-message rules. Read [CONTRIBUTING.md](CONTRIBUTING.md) before your first commit — the short version: branch off `dev` for every change, and use [Conventional Commits](https://www.conventionalcommits.org/).
+
 ### Monorepo structure
 
 - `packages/plugin` — the plugin source code
