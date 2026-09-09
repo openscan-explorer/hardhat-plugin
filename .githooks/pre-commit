@@ -1,0 +1,4 @@
+#!/bin/sh
+# Reject commits made directly on the default branch — one branch per issue.
+# Rules live in lib/git-rules.mjs. Bypass a single commit with --no-verify.
+exec node "$(dirname "$0")/lib/git-rules.mjs" pre-commit
