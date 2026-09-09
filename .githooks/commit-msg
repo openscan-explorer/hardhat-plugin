@@ -1,0 +1,4 @@
+#!/bin/sh
+# Reject commit messages that carry AI attribution or break Conventional Commits.
+# Rules live in lib/git-rules.mjs. Bypass a single commit with --no-verify.
+exec node "$(dirname "$0")/lib/git-rules.mjs" commit-msg "$1"

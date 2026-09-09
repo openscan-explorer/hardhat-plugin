@@ -2,3 +2,6 @@
 /node_modules
 
 .DS_Store
+
+# Per-contributor Claude Code settings
+.claude/settings.local.json

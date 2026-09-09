@@ -6,7 +6,9 @@
     "clean": "pnpm --recursive clean",
     "lint": "pnpm --recursive lint",
     "lint:fix": "pnpm --recursive lint:fix",
+    "prepare": "git config core.hooksPath .githooks || true",
     "test": "pnpm --recursive test",
+    "test:hooks": "node --test .githooks/lib/*.test.mjs",
     "watch": "pnpm --filter ./packages/plugin watch"
   },
   "devDependencies": {
