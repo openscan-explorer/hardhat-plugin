@@ -10,4 +10,6 @@
 # Hardhat files
 /artifacts
 /cache
-/ignition
+
+# Deployment state is regenerated per run; the modules themselves are source
+/ignition/deployments
