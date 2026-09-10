@@ -1,10 +1,12 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import type { ArtifactData, AddressMap } from "./artifacts.js";
+import { resolveSourceCode } from "./source-resolver.js";
 
 interface CompiledArtifact {
   contractName: string;
   sourceName: string;
+  inputSourceName?: string;
   abi: unknown[];
   bytecode: string;
   buildInfoId?: string;
@@ -51,6 +53,7 @@ export class DeploymentTracker {
             this.compiledArtifacts.push({
               contractName: content.contractName as string,
               sourceName: (content.sourceName as string) ?? "",
+              inputSourceName: content.inputSourceName as string | undefined,
               abi: content.abi as unknown[],
               bytecode: content.bytecode as string,
               buildInfoId: content.buildInfoId as string | undefined,
@@ -92,26 +95,7 @@ export class DeploymentTracker {
       deployments: [contractAddress],
     };
 
-    // Try to load source code
-    if (artifact.sourceName) {
-      const sourceFileName = artifact.sourceName.split("/").pop();
-      if (sourceFileName) {
-        const sourcePath = path.join(
-          this.projectRoot,
-          "contracts",
-          sourceFileName,
-        );
-        if (existsSync(sourcePath)) {
-          try {
-            entry.sourceCode = readFileSync(sourcePath, "utf-8");
-          } catch {
-            // ignore
-          }
-        }
-      }
-    }
-
-    // Try to load build info
+    // Try to load build info (before source, which falls back to it)
     if (artifact.buildInfoId) {
       const buildInfoPath = path.join(
         this.projectRoot,
@@ -126,6 +110,16 @@ export class DeploymentTracker {
           // ignore
         }
       }
+    }
+
+    // Try to load source code
+    if (artifact.sourceName) {
+      entry.sourceCode = resolveSourceCode({
+        projectRoot: this.projectRoot,
+        sourceName: artifact.sourceName,
+        inputSourceName: artifact.inputSourceName,
+        buildInfo: entry.buildInfo,
+      });
     }
 
     this.trackedDeployments[contractAddress.toLowerCase()] = entry;

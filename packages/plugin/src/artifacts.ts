@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { resolveSourceCode } from "./source-resolver.js";
 
 export interface ArtifactData {
   abi: unknown[];
@@ -83,9 +84,6 @@ export function loadArtifacts(
   // Build-info directory
   const buildInfoDir = path.join(deploymentPath, "build-info");
 
-  // Contracts source directory
-  const contractsDir = path.join(projectRoot, "contracts");
-
   for (const artifactFile of artifactFiles) {
     const artifactPath = path.join(artifactsDir, artifactFile);
 
@@ -131,18 +129,13 @@ export function loadArtifacts(
     }
 
     // Try to load source code
-    if (artifactData.sourceName && existsSync(contractsDir)) {
-      const sourceFileName = artifactData.sourceName.split("/").pop();
-      if (sourceFileName) {
-        const sourcePath = path.join(contractsDir, sourceFileName);
-        if (existsSync(sourcePath)) {
-          try {
-            artifactData.sourceCode = readFileSync(sourcePath, "utf-8");
-          } catch {
-            // Ignore source code errors
-          }
-        }
-      }
+    if (artifactData.sourceName) {
+      artifactData.sourceCode = resolveSourceCode({
+        projectRoot,
+        sourceName: artifactData.sourceName,
+        inputSourceName: artifact.inputSourceName as string | undefined,
+        buildInfo: artifactData.buildInfo,
+      });
     }
 
     // Store by lowercase address
