@@ -76,6 +76,11 @@ pnpm build && pnpm test && pnpm lint
 pnpm test:hooks   # only if you changed .githooks/
 ```
 
+A change under [packages/plugin/](packages/plugin/) also bumps `version` in its
+`package.json` (minor for `feat`, major for a breaking change, patch
+otherwise) in a final commit whose subject is the bare version (`v1.3.2`).
+Merging to `main` publishes to npm, and an unchanged version publishes nothing.
+
 Push your branch to your fork and open the PR against
 `openscan-explorer/hardhat-plugin`, base `main`:
 
